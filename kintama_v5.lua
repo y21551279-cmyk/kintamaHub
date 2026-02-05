@@ -4,7 +4,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 
@@ -245,3 +244,35 @@ mouse.Button1Down:Connect(function()
         hrp.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0,3,0))
     end
 end)
+-- ▼ スマホUIスクロール対応（v5 mobile fix）▼
+task.wait(0.5)
+
+local player = game.Players.LocalPlayer
+local pg = player:WaitForChild("PlayerGui")
+
+for _,v in ipairs(pg:GetDescendants()) do
+	if v:IsA("Frame") and v.Name:lower():find("kintama") then
+		v.Position = UDim2.new(0.5, 0, 0.45, 0)
+		v.Size = UDim2.new(0, 320, 0, 360)
+
+		if not v:IsA("ScrollingFrame") then
+			local sf = Instance.new("ScrollingFrame")
+			sf.Name = v.Name
+			sf.Size = v.Size
+			sf.Position = v.Position
+			sf.ScrollBarImageTransparency = 0.3
+			sf.Parent = v.Parent
+
+			for _,c in ipairs(v:GetChildren()) do
+				c.Parent = sf
+			end
+			v:Destroy()
+
+			local layout = Instance.new("UIListLayout", sf)
+			layout.Padding = UDim.new(0,6)
+
+			task.wait()
+			sf.CanvasSize = UDim2.new(0,0,0,layout.AbsoluteContentSize.Y + 20)
+		end
+	end
+end
